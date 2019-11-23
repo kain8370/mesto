@@ -15,6 +15,8 @@ module.exports = {
         "sourceType": "module"
     },
     "rules": {
+      "no-underscore-dangle":  ["error", { "allow": ["_id"] }],
+      "no-console": 0
     },
- 	"extends": "airbnb-base"
+ 	"extends": "airbnb-base",
 };
