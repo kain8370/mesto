@@ -1,8 +1,8 @@
 const router = require('express').Router();
-const cards = require('../data/cards.json');
+const { getCards, createCard, deleteCard } = require('../controllers/cards');
 
-router.get('/cards', (req, res) => {
-  res.send(cards);
-});
+router.get('/cards', getCards);
+router.post('/cards', createCard);
+router.delete('/cards/:cardId', deleteCard);
 
 module.exports = router;

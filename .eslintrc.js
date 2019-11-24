@@ -16,7 +16,8 @@ module.exports = {
     },
     "rules": {
       "no-underscore-dangle":  ["error", { "allow": ["_id"] }],
-      "no-console": 0
+      "no-console": 0,
+      "linebreak-style": 0
     },
- 	"extends": "airbnb-base",
+   "extends": "airbnb-base"
 };
