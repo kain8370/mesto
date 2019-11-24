@@ -1,20 +1,30 @@
 const User = require('../models/user');
 
-module.exports.getUsers = (req, res) => {
+function getUsers(req, res) {
   User.find({})
     .then((users) => res.send({ data: users }))
     .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
-};
+}
 
-module.exports.getUserById = (req, res) => {
+function getUserById(req, res) {
   User.findById(req.params.id)
-    .then((user) => res.send({ data: user }))
+    .then((user) => {
+      if (user) {
+        res.send({ data: user });
+      } else {
+        res.status(404).send({ message: 'Такой пользователь не найден' });
+      }
+    })
     .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
-};
+}
 
-module.exports.createUser = (req, res) => {
+function createUser(req, res) {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
     .then((user) => res.send({ data: user }))
     .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+}
+
+module.exports = {
+  getUsers, getUserById, createUser,
 };
