@@ -13,22 +13,29 @@ function getCards(req, res) {
 }
 
 function createCard(req, res) {
-  const { name, link, _id: owner } = req.body;
+  const { name, link } = req.body;
+  const owner = req.user._id;
   Card.create({ name, link, owner })
     .then((card) => res.send({ data: card }))
     .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 }
 
 function deleteCard(req, res) {
-  Card.findByIdAndRemove(req.params.cardId)
+  Card.findById(req.params.cardId)
     .then((card) => {
-      if (card) {
-        res.send({ data: card });
-      } else {
+      if (!card) {
         res.status(404).send({ message: 'Такая карточка не найдена' });
       }
+      if (String(card.owner) === String(req.user._id)) {
+        Card.findByIdAndRemove(req.params.cardId)
+          .then((data) => res.send({ data }));
+      } else {
+        res.status(403).send({ message: 'У вас нету доступа к чужой карточке' });
+      }
     })
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch(() => {
+      res.status(500).send({ message: 'Произошла ошибка' });
+    });
 }
 
 module.exports = {

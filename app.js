@@ -1,8 +1,12 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const routerUsers = require('./routes/users');
 const routerCards = require('./routes/cards');
+const { login, createUser } = require('./controllers/users');
+const auth = require('./middlewares/auth');
 
 const { PORT = 3000 } = process.env;
 
@@ -15,12 +19,12 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useCreateIndex: true,
   useFindAndModify: false,
 });
-app.use((req, res, next) => {
-  req.user = { _id: '5dd974f8a152e911945769a3' };
-  next();
-});
-app.use('/', routerUsers);
-app.use('/', routerCards);
+
+app.use(cookieParser());
+app.post('/signin', login);
+app.post('/signup', createUser);
+app.use('/users', auth, routerUsers);
+app.use('/cards', auth, routerCards);
 app.use('/*', (req, res) => {
   res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });
 });
