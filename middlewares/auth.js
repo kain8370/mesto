@@ -7,17 +7,13 @@ module.exports = (req, res, next) => {
       .status(401)
       .send({ message: 'Необходима авторизация' });
   }
-  let payload;
 
   try {
-    payload = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = jwt.verify(token, process.env.JWT_SECRET);
+    return next();
   } catch (err) {
     return res
       .status(401)
       .send({ message: 'Необходима авторизация' });
   }
-
-  req.user = payload;
-
-  return next();
 };

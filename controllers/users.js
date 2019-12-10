@@ -29,7 +29,14 @@ function createUser(req, res) {
     .then((hash) => User.create({
       name, password: hash, email, about, avatar,
     }))
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.send({
+      data: {
+        name: user.name,
+        email: user.email,
+        about: user.about,
+        avatar: user.avatar,
+      },
+    }))
     .catch(() => res.status(500).send({ message: 'Произошла ошибка, регистрация не выполнена:(' }));
 }
 

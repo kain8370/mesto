@@ -26,8 +26,8 @@ function deleteCard(req, res) {
       if (!card) {
         res.status(404).send({ message: 'Такая карточка не найдена' });
       }
-      if (String(card.owner) === String(req.user._id)) {
-        Card.findByIdAndRemove(req.params.cardId)
+      if (card.owner.toString() === req.user._id.toString()) {
+        Card.deleteMany(card)
           .then((data) => res.send({ data }));
       } else {
         res.status(403).send({ message: 'У вас нету доступа к чужой карточке' });
