@@ -25,19 +25,26 @@ function createUser(req, res) {
   const {
     name, email, about, avatar,
   } = req.body;
-  bcryptjs.hash(req.body.password, 10)
-    .then((hash) => User.create({
-      name, password: hash, email, about, avatar,
-    }))
-    .then((user) => res.send({
-      data: {
-        name: user.name,
-        email: user.email,
-        about: user.about,
-        avatar: user.avatar,
-      },
-    }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка, регистрация не выполнена:(' }));
+  try {
+    if (req.body.password.length < 6) {
+      throw new Error();
+    }
+    bcryptjs.hash(req.body.password, 10)
+      .then((hash) => User.create({
+        name, password: hash, email, about, avatar,
+      }))
+      .then((user) => res.send({
+        data: {
+          name: user.name,
+          email: user.email,
+          about: user.about,
+          avatar: user.avatar,
+        },
+      }))
+      .catch(() => res.status(500).send({ message: 'Произошла ошибка, регистрация не выполнена:(' }));
+  } catch (err) {
+    res.status(418).send({ message: 'Bad password!' });
+  }
 }
 
 function login(req, res) {
