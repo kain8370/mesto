@@ -22,29 +22,28 @@ function getUserById(req, res) {
 }
 
 function createUser(req, res) {
-  const {
-    name, email, about, avatar,
-  } = req.body;
-  try {
-    if (req.body.password.length < 6) {
-      throw new Error();
-    }
-    bcryptjs.hash(req.body.password, 10)
-      .then((hash) => User.create({
-        name, password: hash, email, about, avatar,
-      }))
-      .then((user) => res.send({
-        data: {
-          name: user.name,
-          email: user.email,
-          about: user.about,
-          avatar: user.avatar,
-        },
-      }))
-      .catch(() => res.status(500).send({ message: 'Произошла ошибка, регистрация не выполнена:(' }));
-  } catch (err) {
-    res.status(418).send({ message: 'Bad password!' });
+  const name = req.body.name.trim();
+  const email = req.body.email.trim();
+  const password = req.body.password.trim();
+  const about = req.body.about.trim();
+  const avatar = req.body.avatar.trim();
+
+  if (password.length < 6) {
+    res.status(400).send({ message: 'Bad request!' });
   }
+  bcryptjs.hash(password, 10)
+    .then((hash) => User.create({
+      name, password: hash, email, about, avatar,
+    }))
+    .then((user) => res.send({
+      data: {
+        name: user.name,
+        email: user.email,
+        about: user.about,
+        avatar: user.avatar,
+      },
+    }))
+    .catch(() => res.status(500).send({ message: 'Произошла ошибка, регистрация не выполнена:(' }));
 }
 
 function login(req, res) {
