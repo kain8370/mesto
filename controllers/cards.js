@@ -1,41 +1,45 @@
 const Card = require('../models/card');
+const NotFoundError = require('../errors/not-found-error');
+const ForbiddenError = require('../errors/forbidden-error');
 
-function getCards(req, res) {
+function getCards(req, res, next) {
   Card.find({})
     .then((cards) => {
       if (cards) {
         res.send({ data: cards });
       } else {
-        res.status(404).send({ message: 'Такая карточка не найдена' });
+        throw new NotFoundError('Такая карточка не найдена');
       }
     })
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch(next);
 }
 
-function createCard(req, res) {
+function createCard(req, res, next) {
   const { name, link } = req.body;
   const owner = req.user._id;
   Card.create({ name, link, owner })
     .then((card) => res.send({ data: card }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch(next);
 }
 
-function deleteCard(req, res) {
-  Card.findById(req.params.cardId)
+function deleteCard(req, res, next) {
+  Card.findById(req.params.cardId.toString(), (err) => {
+    if (err) {
+      next(new NotFoundError('Такая карточка не найдена!'));
+    }
+  })
     .then((card) => {
       if (!card) {
-        res.status(404).send({ message: 'Такая карточка не найдена' });
+        throw new NotFoundError('Такая карточка не найдена!');
       }
       if (card.owner.toString() === req.user._id.toString()) {
         Card.remove(card)
           .then((data) => res.send({ data }));
       } else {
-        res.status(403).send({ message: 'У вас нету доступа к чужой карточке' });
+        throw new ForbiddenError('У вас нету доступа к чужой карточке!');
       }
     })
-    .catch(() => {
-      res.status(500).send({ message: 'Произошла ошибка' });
-    });
+    .catch(next);
 }
 
 module.exports = {
