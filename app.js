@@ -45,8 +45,8 @@ app.post('/signup', celebrate({
     name: Joi.string().required().min(2).max(30),
     email: Joi.string().required().email(),
     password: Joi.string().required().min(8),
-    about: Joi.string().min(2).max(30),
-    avatar: Joi.string().min(5),
+    about: Joi.string().required().min(2).max(30),
+    avatar: Joi.string().required().regex(/(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)[a-z0-9]+([-.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)/),
   }),
 }), createUser);
 app.use('/users', auth, routerUsers);
@@ -57,11 +57,10 @@ app.use('/*', (req, res, next) => {
 
 app.use(errorLogger);
 app.use(errors());
-app.use((err, req, res) => {
+app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
-  console.log(err.message);
-  console.log('error!!!!!!');
   res.status(statusCode).send({ message: statusCode === 500 ? 'На сервере произошла ошибка' : message });
+  next();
 });
 
 app.listen(PORT, () => {

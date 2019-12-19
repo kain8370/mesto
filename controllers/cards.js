@@ -23,7 +23,7 @@ function createCard(req, res, next) {
 }
 
 function deleteCard(req, res, next) {
-  Card.findById(req.params.cardId.toString(), (err) => {
+  Card.findById(req.params.cardId, (err) => {
     if (err) {
       next(new NotFoundError('Такая карточка не найдена!'));
     }
